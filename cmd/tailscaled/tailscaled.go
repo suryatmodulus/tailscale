@@ -30,6 +30,7 @@ import (
 
 	"github.com/go-multierror/multierror"
 	"inet.af/netaddr"
+	"tailscale.com/ipn/ipnlocal"
 	"tailscale.com/ipn/ipnserver"
 	"tailscale.com/logpolicy"
 	"tailscale.com/net/dns"
@@ -160,7 +161,12 @@ func main() {
 		log.Fatalf("--socket is required")
 	}
 
-	if err := run(); err != nil {
+	err := run()
+
+	// Remove file sharing from Windows shell (noop in non-windows)
+	ipnlocal.DisableFileSharing()
+
+	if err != nil {
 		// No need to log; the func already did
 		os.Exit(1)
 	}
